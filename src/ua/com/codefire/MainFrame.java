@@ -64,12 +64,12 @@ public class MainFrame extends javax.swing.JFrame {
         jlCategories.setModel(dlm);
 
         manager.close();
-        
+
         UIManager.put("OptionPane.okButtonText", "Понятно");
         UIManager.put("OptionPane.cancelButtonText", "Отмена");
         UIManager.put("OptionPane.yesButtonText", "Да");
         UIManager.put("OptionPane.noButtonText", "Нет");
-        
+
 //        factory.close();
     }
 
@@ -148,6 +148,11 @@ public class MainFrame extends javax.swing.JFrame {
         jcbArtcles.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jcbArtclesActionPerformed(evt);
+            }
+        });
+        jcbArtcles.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jcbArtclesPropertyChange(evt);
             }
         });
 
@@ -272,7 +277,6 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jcbArtclesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbArtclesActionPerformed
         jtaArticleContent.setText(((Article) jcbArtcles.getSelectedItem()).getContent());
-
     }//GEN-LAST:event_jcbArtclesActionPerformed
 
     private void jlCategoriesKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jlCategoriesKeyPressed
@@ -309,6 +313,7 @@ public class MainFrame extends javax.swing.JFrame {
                 manager.close();
 
                 jcbArtcles.getModel().setSelectedItem(article);
+                jtaArticleContent.setText(((Article) jcbArtcles.getSelectedItem()).getContent());
             }
         });
 
@@ -367,14 +372,19 @@ public class MainFrame extends javax.swing.JFrame {
             EntityManager manager = factory.createEntityManager();
 
             manager.getTransaction().begin();
-            manager.remove(article);
-            manager.getTransaction().commit();
 
+            Article toBeRemoved = manager.merge(article);
+            manager.remove(toBeRemoved);
+
+            manager.getTransaction().commit();
             manager.close();
         }
 
 //        jcbArtcles.getModel().setSelectedItem(article);
     }//GEN-LAST:event_jbDelArticleActionPerformed
+
+    private void jcbArtclesPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jcbArtclesPropertyChange
+    }//GEN-LAST:event_jcbArtclesPropertyChange
 
     /**
      * @param args the command line arguments
