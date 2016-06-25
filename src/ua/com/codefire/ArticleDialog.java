@@ -5,14 +5,20 @@
  */
 package ua.com.codefire;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import ua.com.codefire.listener.IArtilceDialogListener;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JFormattedTextField;
+import javax.swing.text.MaskFormatter;
 import static ua.com.codefire.MainFrame.factory;
 import ua.com.codefire.entity.Article;
 import ua.com.codefire.entity.Author;
@@ -92,20 +98,10 @@ public class ArticleDialog extends javax.swing.JDialog {
         }
         jcbAuthors.setModel(dcbm);
 
-        List<Integer> indicesArticleCategory = new ArrayList<>();
-        int numRow = 0;
-
         DefaultListModel dlm = new DefaultListModel();
         // заполняеем список категорий
         for (Category category : categoryList) {
             dlm.addElement(category);
-
-            // ищем категорию в списке категорий статьи, если есть то помечаем как выбранную
-            int foundCategory = articleCategoryList.indexOf(category);
-            if (foundCategory > -1) {
-                indicesArticleCategory.add(numRow);
-            }
-            numRow++;
         }
 
         jlCategory.setModel(dlm);
@@ -117,12 +113,29 @@ public class ArticleDialog extends javax.swing.JDialog {
             jtaContent.setText(article.getContent());
 
             SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+//            try {
 //                jftfTimestamp = new JFormattedTextField(new MaskFormatter("##.##.#### ##:##:##"));
+//            } catch (ParseException ex) {
+//                Logger.getLogger(ArticleDialog.class.getName()).log(Level.SEVERE, null, ex);
+//            }
 
             jftfTimestamp.setValue(formatter.format(article.getTimestamp()));
 
             jcbAuthors.setSelectedItem(article.getAuthor());
 
+            List<Integer> indicesArticleCategory = new ArrayList<>();
+            int numRow = 0;
+
+            // заполняеем список категорий
+            for (Category category : categoryList) {
+
+                // ищем категорию в списке категорий статьи, если есть то помечаем как выбранную
+                int foundCategory = articleCategoryList.indexOf(category);
+                if (foundCategory > -1) {
+                    indicesArticleCategory.add(numRow);
+                }
+                numRow++;
+            }
             jlCategory.setSelectedIndices(indicesArticleCategory.stream().mapToInt(i -> i).toArray());
         }
     }
@@ -302,6 +315,7 @@ public class ArticleDialog extends javax.swing.JDialog {
         article.setAuthor((Author) jcbAuthors.getSelectedItem());
         article.setTitle(jtfTitle.getText());
         article.setContent(jtaContent.getText());
+        article.setTimestamp((Date) jftfTimestamp.getValue());
 
         List<Category> categories;
         categories = jlCategory.getSelectedValuesList();

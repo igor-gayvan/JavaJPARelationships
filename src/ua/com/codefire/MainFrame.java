@@ -382,6 +382,7 @@ public class MainFrame extends javax.swing.JFrame {
 
                 manager.close();
 
+                //TODO добавляем статью в список только в том случае если категории совпадат
                 jcbArtcles.getModel().setSelectedItem(article);
             }
         });
