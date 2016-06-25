@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import ua.com.codefire.entity.Article;
 import ua.com.codefire.entity.Category;
+import ua.com.codefire.listener.ICategoryDialogListener;
 
 /**
  *
@@ -115,6 +116,7 @@ public class MainFrame extends javax.swing.JFrame {
         jtaArticleContent = new javax.swing.JTextArea();
         jToolBar1 = new javax.swing.JToolBar();
         jbAddCategory = new javax.swing.JButton();
+        jbEditCategory = new javax.swing.JButton();
         jbDelCategory = new javax.swing.JButton();
         jToolBar2 = new javax.swing.JToolBar();
         jbAddArticle = new javax.swing.JButton();
@@ -174,7 +176,23 @@ public class MainFrame extends javax.swing.JFrame {
         jbAddCategory.setFocusable(false);
         jbAddCategory.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbAddCategory.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jbAddCategory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbAddCategoryActionPerformed(evt);
+            }
+        });
         jToolBar1.add(jbAddCategory);
+
+        jbEditCategory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/edit_blue.png"))); // NOI18N
+        jbEditCategory.setFocusable(false);
+        jbEditCategory.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbEditCategory.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jbEditCategory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbEditCategoryActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jbEditCategory);
 
         jbDelCategory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete.png"))); // NOI18N
         jbDelCategory.setFocusable(false);
@@ -225,16 +243,21 @@ public class MainFrame extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1)))
-                    .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(67, 67, 67))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                .addGap(7, 7, 7))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 521, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 494, Short.MAX_VALUE)
                     .addComponent(jcbArtcles, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jToolBar2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -299,7 +322,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         articleDialog.addActionListener(new IArtilceDialogListener() {
             @Override
-            public void addEditArticleAction() {
+            public void addEditDialogAction() {
 
                 Article article = articleDialog.getArticle();
 
@@ -308,6 +331,8 @@ public class MainFrame extends javax.swing.JFrame {
 
                 manager.getTransaction().begin();
                 manager.merge(article);
+
+                manager.flush();
                 manager.getTransaction().commit();
 
                 manager.close();
@@ -337,7 +362,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         articleDialog.addActionListener(new IArtilceDialogListener() {
             @Override
-            public void addEditArticleAction() {
+            public void addEditDialogAction() {
                 Article article = articleDialog.getArticle();
 
                 // Statement
@@ -345,9 +370,9 @@ public class MainFrame extends javax.swing.JFrame {
 
                 manager.getTransaction().begin();
                 manager.persist(article);
+                manager.flush();
                 manager.getTransaction().commit();
 
-                manager.flush();
                 manager.close();
 
                 jcbArtcles.getModel().setSelectedItem(article);
@@ -376,6 +401,7 @@ public class MainFrame extends javax.swing.JFrame {
             Article toBeRemoved = manager.merge(article);
             manager.remove(toBeRemoved);
 
+            manager.flush();
             manager.getTransaction().commit();
             manager.close();
         }
@@ -385,6 +411,75 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jcbArtclesPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jcbArtclesPropertyChange
     }//GEN-LAST:event_jcbArtclesPropertyChange
+
+    private void jbEditCategoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbEditCategoryActionPerformed
+        int curRow = jlCategories.getSelectedIndex();
+
+        if (curRow == -1) {
+            JOptionPane.showMessageDialog(this, "Выберите категорию для редактирования", "Предупреждение", JOptionPane.OK_OPTION);
+            return;
+        }
+
+        Category category = (Category) jlCategories.getSelectedValue();
+
+        CategoryDialog categoryDialog = new CategoryDialog(this, true, category, EModeArticleDialog.EDIT);
+
+        categoryDialog.setLocationRelativeTo(this);
+
+        categoryDialog.addActionListener(new ICategoryDialogListener() {
+            @Override
+            public void addEditDialogAction() {
+
+                Category category = categoryDialog.getCategory();
+
+                // Statement
+                EntityManager manager = factory.createEntityManager();
+
+                manager.getTransaction().begin();
+                manager.merge(category);
+
+                manager.flush();
+                manager.getTransaction().commit();
+
+                manager.close();
+
+//                jcbArtcles.getModel().setSelectedItem(article);
+//                jtaArticleContent.setText(((Article) jcbArtcles.getSelectedItem()).getContent());
+            }
+        });
+
+        categoryDialog.setVisible(true);
+    }//GEN-LAST:event_jbEditCategoryActionPerformed
+
+    private void jbAddCategoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbAddCategoryActionPerformed
+        Category category = new Category();
+
+        CategoryDialog categoryDialog = new CategoryDialog(this, true, category, EModeArticleDialog.ADD);
+
+        categoryDialog.setLocationRelativeTo(this);
+
+        categoryDialog.addActionListener(new ICategoryDialogListener() {
+            @Override
+            public void addEditDialogAction() {
+                Category category = categoryDialog.getCategory();
+
+                // Statement
+                EntityManager manager = factory.createEntityManager();
+
+                manager.getTransaction().begin();
+                manager.persist(category);
+                manager.flush();
+                manager.getTransaction().commit();
+
+                manager.close();
+
+                ((DefaultListModel) jlCategories.getModel()).addElement(category);
+                jlCategories.setSelectedValue(category, true);
+            }
+        });
+
+        categoryDialog.setVisible(true);
+    }//GEN-LAST:event_jbAddCategoryActionPerformed
 
     /**
      * @param args the command line arguments
@@ -434,6 +529,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton jbDelArticle;
     private javax.swing.JButton jbDelCategory;
     private javax.swing.JButton jbEditArticle;
+    private javax.swing.JButton jbEditCategory;
     private javax.swing.JComboBox<Article> jcbArtcles;
     private javax.swing.JList<Category> jlCategories;
     private javax.swing.JTextArea jtaArticleContent;

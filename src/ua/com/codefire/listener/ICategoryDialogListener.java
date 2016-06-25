@@ -9,7 +9,7 @@ package ua.com.codefire.listener;
  *
  * @author Haivan
  */
-public interface IArtilceDialogListener {
+public interface ICategoryDialogListener {
 
     public void addEditDialogAction();
 }

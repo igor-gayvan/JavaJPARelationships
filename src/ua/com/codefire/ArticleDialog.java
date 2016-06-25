@@ -325,7 +325,7 @@ public class ArticleDialog extends javax.swing.JDialog {
 //        article.setTimestamp(jftfTimestamp.getText());
 
         for (IArtilceDialogListener artilceDialogListener : addEditArticleListeners) {
-            artilceDialogListener.addEditArticleAction();
+            artilceDialogListener.addEditDialogAction();
         }
 
         dispose();
