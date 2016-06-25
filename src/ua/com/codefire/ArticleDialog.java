@@ -5,19 +5,14 @@
  */
 package ua.com.codefire;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import ua.com.codefire.listener.IArtilceDialogListener;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
-import javax.swing.JFormattedTextField;
-import javax.swing.text.MaskFormatter;
 import static ua.com.codefire.MainFrame.factory;
 import ua.com.codefire.entity.Article;
 import ua.com.codefire.entity.Author;
@@ -33,6 +28,8 @@ public class ArticleDialog extends javax.swing.JDialog {
     private EModeArticleDialog modeArticleDialog;
 
     private List<IArtilceDialogListener> addEditArticleListeners;
+
+    private static SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
     /**
      * Creates new form ArticleDialog
@@ -120,21 +117,14 @@ public class ArticleDialog extends javax.swing.JDialog {
             jtaContent.setText(article.getContent());
 
             SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-            String dateString = formatter.format(article.getTimestamp());
-            try {
-                jftfTimestamp = new JFormattedTextField(new MaskFormatter("##.##.#### ##:##:##"));
-            } catch (ParseException ex) {
-                Logger.getLogger(ArticleDialog.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            jftfTimestamp.setColumns(20);
-            jftfTimestamp.setValue(article.getTimestamp());
-            jftfTimestamp.setText(dateString);
-            //        jftfTimestamp.setText(article.getTimestamp().toString());
+//                jftfTimestamp = new JFormattedTextField(new MaskFormatter("##.##.#### ##:##:##"));
+
+            jftfTimestamp.setValue(formatter.format(article.getTimestamp()));
 
             jcbAuthors.setSelectedItem(article.getAuthor());
 
             jlCategory.setSelectedIndices(indicesArticleCategory.stream().mapToInt(i -> i).toArray());
-        } 
+        }
     }
 
     /**
