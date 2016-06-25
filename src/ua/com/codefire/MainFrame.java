@@ -91,8 +91,9 @@ public class MainFrame extends javax.swing.JFrame {
 
             jcbArtcles.setModel(dcbm);
 
-            jtaArticleContent.setText(articleList.get(0).getContent());
-
+            if (articleList.size() > 0) {
+                jtaArticleContent.setText(articleList.get(0).getContent());
+            }
             manager.close();
         }
     }
@@ -133,6 +134,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        jlCategories.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jlCategories.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jlCategoriesMouseClicked(evt);
@@ -198,6 +200,11 @@ public class MainFrame extends javax.swing.JFrame {
         jbDelCategory.setFocusable(false);
         jbDelCategory.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbDelCategory.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jbDelCategory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbDelCategoryActionPerformed(evt);
+            }
+        });
         jToolBar1.add(jbDelCategory);
 
         jToolBar2.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -404,9 +411,11 @@ public class MainFrame extends javax.swing.JFrame {
             manager.flush();
             manager.getTransaction().commit();
             manager.close();
+
+            ((DefaultComboBoxModel) jcbArtcles.getModel()).removeElement(article);
         }
 
-//        jcbArtcles.getModel().setSelectedItem(article);
+
     }//GEN-LAST:event_jbDelArticleActionPerformed
 
     private void jcbArtclesPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jcbArtclesPropertyChange
@@ -480,6 +489,33 @@ public class MainFrame extends javax.swing.JFrame {
 
         categoryDialog.setVisible(true);
     }//GEN-LAST:event_jbAddCategoryActionPerformed
+
+    private void jbDelCategoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbDelCategoryActionPerformed
+        int curRow = jlCategories.getSelectedIndex();
+
+        if (curRow == -1) {
+            JOptionPane.showMessageDialog(this, "Выберите запись для удаления", "Предупреждение", JOptionPane.OK_OPTION);
+            return;
+        }
+
+        if (JOptionPane.showConfirmDialog(this, "Вы действительно хотите удалить запись?", "Предупреждение", JOptionPane.YES_NO_OPTION) == JOptionPane.OK_OPTION) {
+            Category category = (Category) jlCategories.getSelectedValue();
+
+            // Statement
+            EntityManager manager = factory.createEntityManager();
+
+            manager.getTransaction().begin();
+
+            Category toBeRemoved = manager.merge(category);
+            manager.remove(toBeRemoved);
+
+            manager.flush();
+            manager.getTransaction().commit();
+            manager.close();
+
+            ((DefaultListModel) jlCategories.getModel()).removeElement(category);
+        }
+    }//GEN-LAST:event_jbDelCategoryActionPerformed
 
     /**
      * @param args the command line arguments
