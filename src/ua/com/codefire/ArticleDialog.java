@@ -17,7 +17,6 @@ import javax.persistence.TypedQuery;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JFormattedTextField;
-import static javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
 import javax.swing.text.MaskFormatter;
 import static ua.com.codefire.MainFrame.factory;
 import ua.com.codefire.entity.Article;
@@ -96,10 +95,20 @@ public class ArticleDialog extends javax.swing.JDialog {
         }
         jcbAuthors.setModel(dcbm);
 
+        List<Integer> indicesArticleCategory = new ArrayList<>();
+        int numRow = 0;
+
         DefaultListModel dlm = new DefaultListModel();
         // заполняеем список категорий
         for (Category category : categoryList) {
             dlm.addElement(category);
+
+            // ищем категорию в списке категорий статьи, если есть то помечаем как выбранную
+            int foundCategory = articleCategoryList.indexOf(category);
+            if (foundCategory > -1) {
+                indicesArticleCategory.add(numRow);
+            }
+            numRow++;
         }
 
         jlCategory.setModel(dlm);
@@ -124,22 +133,8 @@ public class ArticleDialog extends javax.swing.JDialog {
 
             jcbAuthors.setSelectedItem(article.getAuthor());
 
-            List<Integer> indicesArticleCategory = new ArrayList<>();
-            int numRow = 0;
-            for (Category category : categoryList) {
-                // ищем категорию в списке категорий статьи, если есть то помечаем как выбранную
-                int foundCategory = articleCategoryList.indexOf(category);
-                if (foundCategory > -1) {
-                    indicesArticleCategory.add(numRow);
-                }
-                numRow++;
-            }
             jlCategory.setSelectedIndices(indicesArticleCategory.stream().mapToInt(i -> i).toArray());
-        }
-        else
-        {
-            
-        }
+        } 
     }
 
     /**
