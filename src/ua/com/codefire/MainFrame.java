@@ -378,21 +378,23 @@ public class MainFrame extends javax.swing.JFrame {
 
                 manager.getTransaction().begin();
                 manager.persist(article);
-//                manager.merge(category);
-//                manager.refresh(category);
                 manager.flush();
-                manager.getTransaction().commit();                
+                manager.getTransaction().commit();
+
+                Category categoryRefresh = manager.merge(category);
+                manager.refresh(categoryRefresh);
 
                 manager.close();
 
                 //TODO добавляем статью в список только в том случае если категории совпадат
 //                showArticlesList();
-//                List<Article> al = category.getArticles();
-//                int f = al.indexOf(article);
-//
-//                if (f > -1) {
+                List<Article> al = categoryRefresh.getArticles();
+                int f = al.indexOf(article);
+
+                if (f > -1) {
+                    ((DefaultComboBoxModel) jcbArtcles.getModel()).addElement(article);
                     jcbArtcles.getModel().setSelectedItem(article);
-//                }
+                }
             }
         });
 
