@@ -36,6 +36,7 @@ public class CategoryDialog extends javax.swing.JDialog {
         initComponents();
 
         this.addEditListeners = new ArrayList<>();
+        this.setTitle(modeArticleDialog.toString());
 
         this.category = category;
         this.modeArticleDialog = modeArticleDialog;

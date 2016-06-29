@@ -371,19 +371,28 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void addEditDialogAction() {
                 Article article = articleDialog.getArticle();
+                Category category = jlCategories.getModel().getElementAt(jlCategories.getSelectedIndex());
 
                 // Statement
                 EntityManager manager = factory.createEntityManager();
 
                 manager.getTransaction().begin();
                 manager.persist(article);
+//                manager.merge(category);
+//                manager.refresh(category);
                 manager.flush();
-                manager.getTransaction().commit();
+                manager.getTransaction().commit();                
 
                 manager.close();
 
                 //TODO добавляем статью в список только в том случае если категории совпадат
-                jcbArtcles.getModel().setSelectedItem(article);
+                showArticlesList();
+//                List<Article> al = category.getArticles();
+//                int f = al.indexOf(article);
+//
+//                if (f > -1) {
+//                    jcbArtcles.getModel().setSelectedItem(article);
+//                }
             }
         });
 
