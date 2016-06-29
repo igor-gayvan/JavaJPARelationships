@@ -386,12 +386,12 @@ public class MainFrame extends javax.swing.JFrame {
                 manager.close();
 
                 //TODO добавляем статью в список только в том случае если категории совпадат
-                showArticlesList();
+//                showArticlesList();
 //                List<Article> al = category.getArticles();
 //                int f = al.indexOf(article);
 //
 //                if (f > -1) {
-//                    jcbArtcles.getModel().setSelectedItem(article);
+                    jcbArtcles.getModel().setSelectedItem(article);
 //                }
             }
         });
