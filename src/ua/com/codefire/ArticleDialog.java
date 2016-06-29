@@ -5,9 +5,13 @@
  */
 package ua.com.codefire;
 
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import ua.com.codefire.listener.IArtilceDialogListener;
 import java.util.List;
 import java.util.logging.Level;
@@ -17,8 +21,11 @@ import javax.persistence.TypedQuery;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JFormattedTextField;
-import static javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
+import javax.swing.JFormattedTextField.AbstractFormatter;
+import javax.swing.text.DateFormatter;
+import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
+import javax.swing.text.NumberFormatter;
 import static ua.com.codefire.MainFrame.factory;
 import ua.com.codefire.entity.Article;
 import ua.com.codefire.entity.Author;
@@ -35,6 +42,8 @@ public class ArticleDialog extends javax.swing.JDialog {
 
     private List<IArtilceDialogListener> addEditArticleListeners;
 
+    private static SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
     /**
      * Creates new form ArticleDialog
      */
@@ -48,6 +57,7 @@ public class ArticleDialog extends javax.swing.JDialog {
         initComponents();
 
         this.addEditArticleListeners = new ArrayList<>();
+        this.setTitle(modeArticleDialog.toString() + ":" + modeArticleDialog.getValue()+":"+modeArticleDialog.getCode());
 
         this.article = article;
         this.modeArticleDialog = modeArticleDialog;
@@ -104,29 +114,49 @@ public class ArticleDialog extends javax.swing.JDialog {
 
         jlCategory.setModel(dlm);
 
-        if (modeArticleDialog == EModeArticleDialog.EDIT | modeArticleDialog == EModeArticleDialog.VIEW) {
+        DateFormat date = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        DateFormatter dateFormatter = new DateFormatter(date);
+////        MaskFormatter dateFormatter = null;
+////        try {
+////            dateFormatter = new MaskFormatter("##.##.#### ##:##:##");
+////        } catch (ParseException ex) {
+////            Logger.getLogger(ArticleDialog.class.getName()).log(Level.SEVERE, null, ex);
+////        }
+////        // Форматирующий объект даты
+////        DateFormatter dateFormatter = new DateFormatter(date);
+//        dateFormatter.setAllowsInvalid(false);
+////        dateFormatter.setMask("##.##.#### ##:##:##");
+//        dateFormatter.setOverwriteMode(true);
+//
+//        // Создание форматированного текстового поля даты
+        jftfTimestamp = new JFormattedTextField(dateFormatter);
+//        jftfTimestamp.setColumns(32);
+        jftfTimestamp.setValue(new Date());
+
+//        MaskFormatter phoneFormatter = null;
+//        try {
+//            phoneFormatter = new MaskFormatter("+#-###-###-##-##");
+//        } catch (ParseException ex) {
+//            Logger.getLogger(ArticleDialog.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        phoneFormatter.setPlaceholderCharacter('0');
+//        JFormattedTextField ftfPhone = new JFormattedTextField(phoneFormatter);
+//        jftfTimestamp.setColumns(16);
+        if (EModeArticleDialog.EDIT.equals(modeArticleDialog) | EModeArticleDialog.VIEW.equals(modeArticleDialog)) {
             jtfId.setText(article.getId().toString());
 
             jtfTitle.setText(article.getTitle());
             jtaContent.setText(article.getContent());
 
-            SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-            String dateString = formatter.format(article.getTimestamp());
-            try {
-                jftfTimestamp = new JFormattedTextField(new MaskFormatter("##.##.#### ##:##:##"));
-            } catch (ParseException ex) {
-                Logger.getLogger(ArticleDialog.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            jftfTimestamp.setColumns(20);
-            jftfTimestamp.setValue(article.getTimestamp());
-            jftfTimestamp.setText(dateString);
-            //        jftfTimestamp.setText(article.getTimestamp().toString());
-
+//            jftfTimestamp = new JFormattedTextField(new RegexFormatter("\\(\\d{3}\\)\\d{3}-\\d{4}"));
             jcbAuthors.setSelectedItem(article.getAuthor());
 
             List<Integer> indicesArticleCategory = new ArrayList<>();
             int numRow = 0;
+
+            // заполняеем список категорий
             for (Category category : categoryList) {
+
                 // ищем категорию в списке категорий статьи, если есть то помечаем как выбранную
                 int foundCategory = articleCategoryList.indexOf(category);
                 if (foundCategory > -1) {
@@ -135,10 +165,6 @@ public class ArticleDialog extends javax.swing.JDialog {
                 numRow++;
             }
             jlCategory.setSelectedIndices(indicesArticleCategory.stream().mapToInt(i -> i).toArray());
-        }
-        else
-        {
-            
         }
     }
 
@@ -317,6 +343,7 @@ public class ArticleDialog extends javax.swing.JDialog {
         article.setAuthor((Author) jcbAuthors.getSelectedItem());
         article.setTitle(jtfTitle.getText());
         article.setContent(jtaContent.getText());
+        article.setTimestamp((Date) jftfTimestamp.getValue());
 
         List<Category> categories;
         categories = jlCategory.getSelectedValuesList();
@@ -325,7 +352,7 @@ public class ArticleDialog extends javax.swing.JDialog {
 //        article.setTimestamp(jftfTimestamp.getText());
 
         for (IArtilceDialogListener artilceDialogListener : addEditArticleListeners) {
-            artilceDialogListener.addEditArticleAction();
+            artilceDialogListener.addEditDialogAction();
         }
 
         dispose();

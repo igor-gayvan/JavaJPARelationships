@@ -7,7 +7,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 import ua.com.codefire.entity.Article;
 import ua.com.codefire.entity.User;
 
-@Generated(value="EclipseLink-2.5.2.v20140319-rNA", date="2016-06-25T17:05:31")
+@Generated(value="EclipseLink-2.5.2.v20140319-rNA", date="2016-06-26T00:41:41")
 @StaticMetamodel(Author.class)
 public class Author_ { 
 
